@@ -325,7 +325,7 @@ class SimTable( object ):
             self.__dict__[ colname  ] = hdata[:][colname]
 
         # Make some shortcut aliases to most useful metadata
-        for alias, fullname in ( [['z','SIM_REDSHIFT'], ['type','SNTYPE'],['mjdpk','SIM_PEAKMJD'],
+        for alias, fullname in ( [['z','SIM_REDSHIFT_CMB'], ['type','SNTYPE'],['mjdpk','SIM_PEAKMJD'],
                                   ['Hpk','SIM_PEAKMAG_H'],['Jpk','SIM_PEAKMAG_J'],['Wpk','SIM_PEAKMAG_W'],
                                   ['Zpk','SIM_PEAKMAG_Z'],['Ipk','SIM_PEAKMAG_I'],['Xpk','SIM_PEAKMAG_X'],
                                   ['Vpk','SIM_PEAKMAG_V'], ]) : 
@@ -361,8 +361,8 @@ class SimTable( object ):
         for varname in VARNAMES : 
             varcol = VARNAMES.index( varname ) + 1 
             self.DUMP[varname] = np.array( dumpdat[:,varcol], dtype=float )
-        if 'SIM_EFFMASK' in VARNAMES : 
-            ieffmask = VARNAMES.index( 'SIM_EFFMASK' ) + 1
+        if 'SIMEFMSK' in VARNAMES : 
+            ieffmask = VARNAMES.index( 'SIMEFMSK' ) + 1
             self.DUMP['IDET_EFFMASK'] = (np.array(dumpdat[:,ieffmask], dtype=int)>=3)
             self.DUMP['IREJ_EFFMASK'] = (np.array(dumpdat[:,ieffmask], dtype=int)<3)
             self.DUMP['idet'] = self.DUMP['IDET_EFFMASK']
@@ -524,7 +524,7 @@ class SimTable( object ):
         start = time.time()
 
         headcolumns     = ['PTROBS_MIN','PTROBS_MAX','NOBS','SNID','SNTYPE','MWEBV','PEAKMJD',
-                           'SIM_MODEL_NAME','SIM_MODEL_INDEX', 'SIM_NON1a', 'SIM_REDSHIFT',
+                           'SIM_MODEL_NAME','SIM_MODEL_INDEX', 'SIM_NON1a', 'SIM_REDSHIFT_CMB',
                            'SIM_DLMU', 'SIM_SALT2mB','SIM_SALT2x0','SIM_SALT2x1', 'SIM_SALT2c', 
                            'SIM_AV', 'SIM_RV', ]
         photcolumns = ['MJD','FLT','FLUXCAL','FLUXCALERR','MAG','MAGERR','ZEROPT']
@@ -942,7 +942,8 @@ class SuperNova( object ) :
         elif 'REDSHIFT' in self.__dict__ : return( self.REDSHIFT ) 
         elif self.zspec > 0 : return( self.zspec ) 
         elif self.zphot > 0 : return( self.zphot ) 
-        elif 'SIM_REDSHIFT' in self.__dict__ : return( self.SIM_REDSHIFT ) 
+        elif 'SIM_REDSHIFT_CMB' in self.__dict__ : return( self.SIM_REDSHIFT_CMB )
+        elif 'SIM_REDSHIFT' in self.__dict__ : return( self.SIM_REDSHIFT )
         else : return( 0 )
 
     @property
@@ -1080,7 +1081,7 @@ class SuperNova( object ) :
                     'SEARCH_PEAKMJD','SEARCH_PEAKMJDERR',
                     'PEAKMJD','PEAKMJDERR',
                     'SIM_SALT2c','SIM_SALT2x1','SIM_SALT2mB','SIM_SALT2alpha',
-                    'SIM_SALT2beta','SIM_REDSHIFT','SIM_PEAKMJD','HOST_SEDTYPE',
+                    'SIM_SALT2beta','SIM_REDSHIFT_CMB','SIM_PEAKMJD','HOST_SEDTYPE',
                     'HOST_MORPHOLOGY','HOST_B-K','HOST_MK', 'HOST_REFF', 
                     'HOST_GALAXY_Z68','HOST_GALAXY_Z95','GRADE'] : 
             if key in kwarg : 
@@ -1122,7 +1123,7 @@ class SuperNova( object ) :
             self.__dict__[ hhead['TTYPE%i'%(ihcol+1)] ] = hdata[isn][ihcol] 
         
         # Make some shortcut aliases to most useful metadata
-        for alias, fullname in ( [['z','SIM_REDSHIFT'], ['type','SNTYPE'],['mjdpk','SIM_PEAKMJD'],
+        for alias, fullname in ( [['z','SIM_REDSHIFT_CMB'], ['type','SNTYPE'],['mjdpk','SIM_PEAKMJD'],
                                   ['Hpk','SIM_PEAKMAG_H'],['Jpk','SIM_PEAKMAG_J'],['Wpk','SIM_PEAKMAG_W'],
                                   ['Zpk','SIM_PEAKMAG_Z'],['Ipk','SIM_PEAKMAG_I'],['Xpk','SIM_PEAKMAG_X'],['Vpk','SIM_PEAKMAG_V'],
                                   ]) : 
@@ -1350,7 +1351,7 @@ class SuperNova( object ) :
   &SNLCINP
      VERSION_PHOTOMETRY = 'HST_%s'
      HFILE_OUT          = 'snfit_%s_%s.his'
-     HFILE_KCOR         = 'HST/kcor_HST_SALT2.his'
+     HFILE_KCOR         = 'HST/kcor_HST_AB.fits'
      NFIT_ITERATION = 6
      INTERP_OPT     = 1
      USE_MWCOR = T
@@ -1750,7 +1751,7 @@ class SuperNova( object ) :
                    avprior=lambda Av: avpriorexp( Av, 0.7), 
                    zprior= lambda z : np.ones(len(z)), npkmjd = 30,
                    clobber=False, verbose=True, debug=False, 
-                   kcorfile='HST/kcor_HST.fits',
+                   kcorfile='HST/kcor_HST_AB.fits',
                    pdzfile='', nlogz=0):
         """ redirects to doGridClassify.  See the doGridClassify doc string for help.
         See doClassifyMC for classifications using MC sims """
@@ -1768,7 +1769,7 @@ class SuperNova( object ) :
                              cprior= extinction.midIa_c,
                              avprior= extinction.midCC,
                              zprior= lambda z : np.ones(len(z)),
-                             kcorfile='HST/kcor_HST.fits', pdzfile='', 
+                             kcorfile='HST/kcor_HST_AB.fits', pdzfile='',
                              clobber=False, verbose=True, debug=False):
         """ Compute classification probabilities from comparison of this observed SN light curve 
         against synthetic light curves from SNANA Monte Carlo simulations.
@@ -1889,7 +1890,7 @@ class SuperNova( object ) :
                        x1prior=lambda x1: bifgauss( x1, 0, 1.5, 0.9), cprior= extinction.midIa_c, 
                        avprior= extinction.midCC, zprior='host', #lambda z : np.ones(len(z)), 
                        classfractions='mid', clobber=False, verbose=True, debug=False,
-                       kcorfile='HST/kcor_HST.fits', pdzfile='', 
+                       kcorfile='HST/kcor_HST_AB.fits', pdzfile='',
                        nlogz=0, ncolorpar=0, ncolorlaw=0, nlumipar=0, npkmjd = 0,
                        omitTemplateIbc='', omitTemplateII='', getSystematicError=False, 
                        getSNphotz=True ):
@@ -2464,7 +2465,7 @@ class SuperNova( object ) :
                                verbose=True, clobber=False, debug=False, 
                                nlogz=0, ncolorpar=0, ncolorlaw=0, nlumipar=0, npkmjd=0,
                                omitTemplateIbc='', omitTemplateII='',
-                               kcorfile='HST/kcor_HST.fits' ):
+                               kcorfile='HST/kcor_HST_AB.fits' ):
         """D. Jones - 3/27/13 
 
         classname  :  the SN class to compare against ('Ia', 'Ibc', or 'II')
@@ -2718,9 +2719,9 @@ class SuperNova( object ) :
                             mjdsim = tobssim + pkmjdvalues[ipm]  # the same mjdsim array is applicable for all filters
 
                             # for each band, interpolate from simulated MJDs to the actual observation times
-                            fluxsim_tobs_unscaled = dict( [ [ f, np.interp( mjdobs[igoodobs][ithisfiltobs[f]], mjdsim, 
-                                                                            fluxsim[ithisfiltsim[f]], left=0, right=0 ) ]
-                                                            for f in bands ] )
+                            # fluxsim_tobs_unscaled = dict( [ [ f, np.interp( mjdobs[igoodobs][ithisfiltobs[f]], mjdsim,
+                            #                                                 fluxsim[ithisfiltsim[f]], left=0, right=0 ) ]
+                            #                                 for f in bands ] )
 
                             # construct a vector of model errors, one for each obs point, 
                             # inflating the rest-frame UVIS uncertainty if requested
@@ -2870,7 +2871,7 @@ class SuperNova( object ) :
 
     def getGridSim( self, simroot='HST_classify', Nsim=2000, 
                     simpriors=False, clobber=False, verbose=False, 
-                    kcorfile='HST/kcor_HST.fits', trestrange=[-15,35],
+                    kcorfile='HST/kcor_HST_AB.fits', trestrange=[-15,35],
                     nlogz=0, ncolorpar=0, ncolorlaw=0, nlumipar=0,
                     omitTemplateIbc='', omitTemplateII='' ):
         """ D. Jones - 3/27/13
@@ -3367,7 +3368,7 @@ class SuperNova( object ) :
                         #          head_width=2., head_length=0.1  )
 
         if ytype=='mag': 
-            ax.set_ylabel( 'Vega mag' )
+            ax.set_ylabel( '%s mag'%self.SURVEYDATA.MAGREF )
             if not autozoom : ax.set_ylim( magmax+0.1, magmin-0.1) 
             if not ax.yaxis_inverted() : ax.invert_yaxis()
         elif ytype=='flux':

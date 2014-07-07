@@ -1,0 +1,187 @@
+ SNANA_DIR   = /usr/local/SNANA 
+ SNDATA_ROOT = /usr/local/SNDATA_ROOT 
+
+  Size of SNSED     struct : 10.95 Mb 
+  Size of KCOR_GRID struct :  0.00 Mb 
+  Size of FILTER    struct :  4.83 Mb 
+  Size of PRIMARYSED   struct :  1.21 Mb 
+  PROCESS COMMAND LINE ARG: SKIPKCOR 
+ --------------------------------------------------------
+  Read user input file: kcor_HST_AB.input 
+
+	 Found MAGSYSTEM 'AB' with offset =  -48.600 
+	 Could not find HST/HST_CANDELS/ZPOFF.DAT => no ZP offsets. 
+	 (1) ACS_WFC_F435W-B  COUNT-flux filter => HST/HST_CANDELS/ACS_WFC_F435W.dat 
+	 (2) ACS_WFC_F475W-G  COUNT-flux filter => HST/HST_CANDELS/ACS_WFC_F475W.dat 
+	 (3) ACS_WFC_F606W-V  COUNT-flux filter => HST/HST_CANDELS/ACS_WFC_F606W.dat 
+	 (4) ACS_WFC_F625W-R  COUNT-flux filter => HST/HST_CANDELS/ACS_WFC_F625W.dat 
+	 (5) ACS_WFC_F775W-X  COUNT-flux filter => HST/HST_CANDELS/ACS_WFC_F775W.dat 
+	 (6) ACS_WFC_F814W-I  COUNT-flux filter => HST/HST_CANDELS/ACS_WFC_F814W.dat 
+	 (7) ACS_WFC_F850LP-Z  COUNT-flux filter => HST/HST_CANDELS/ACS_WFC_F850LP.dat 
+	 (8) WFC3_UVIS_F225W-S  COUNT-flux filter => HST/HST_CANDELS/WFC3_UVIS_F225W.dat 
+	 (9) WFC3_UVIS_F275W-T  COUNT-flux filter => HST/HST_CANDELS/WFC3_UVIS_F275W.dat 
+	 (10) WFC3_UVIS_F336W-U  COUNT-flux filter => HST/HST_CANDELS/WFC3_UVIS_F336W.dat 
+	 (11) WFC3_UVIS_F390W-C  COUNT-flux filter => HST/HST_CANDELS/WFC3_UVIS_F390W.dat 
+	 (12) WFC3_UVIS_F350LP-W  COUNT-flux filter => HST/HST_CANDELS/WFC3_UVIS_F350LP.dat 
+	 (13) WFC3_UVIS_F689M-6  COUNT-flux filter => HST/HST_CANDELS/WFC3_UVIS_F689M.dat 
+	 (14) WFC3_UVIS_F763M-7  COUNT-flux filter => HST/HST_CANDELS/WFC3_UVIS_F763M.dat 
+	 (15) WFC3_UVIS_F845M-8  COUNT-flux filter => HST/HST_CANDELS/WFC3_UVIS_F845M.dat 
+	 (16) WFC3_IR_F105W-Y  COUNT-flux filter => HST/HST_CANDELS/WFC3_IR_F105W.dat 
+	 (17) WFC3_IR_F110W-M  COUNT-flux filter => HST/HST_CANDELS/WFC3_IR_F110W.dat 
+	 (18) WFC3_IR_F125W-J  COUNT-flux filter => HST/HST_CANDELS/WFC3_IR_F125W.dat 
+	 (19) WFC3_IR_F140W-N  COUNT-flux filter => HST/HST_CANDELS/WFC3_IR_F140W.dat 
+	 (20) WFC3_IR_F160W-H  COUNT-flux filter => HST/HST_CANDELS/WFC3_IR_F160W.dat 
+	 (21) F110W_NIC2-E  COUNT-flux filter => HST/HST_CANDELS/NICMOS_NIC2_F110W.dat 
+	 (22) F160W_NIC2-F  COUNT-flux filter => HST/HST_CANDELS/NICMOS_NIC2_F160W.dat 
+	 (23) WFC3_IR_F098M-L  COUNT-flux filter => HST/HST_CANDELS/WFC3_IR_F098M.dat 
+	 (24) WFC3_IR_F127M-O  COUNT-flux filter => HST/HST_CANDELS/WFC3_IR_F127M.dat 
+	 (25) WFC3_IR_F139M-P  COUNT-flux filter => HST/HST_CANDELS/WFC3_IR_F139M.dat 
+	 (26) WFC3_IR_F153M-Q  COUNT-flux filter => HST/HST_CANDELS/WFC3_IR_F153M.dat 
+	 RV = A(V)/E(B-V) : 3.10  and CCM89 law 
+  PROCESS COMMAND LINE ARG: SKIPKCOR 
+	 SN Ia templates:   Hsiao07.extrap.dat 
+	 SN SED Fudge file: NULL 
+	 TREF_EXPLODE =  -19.0 days (rest-frame)
+	 REDSHIFT range from 0.000 to 3.000 
+	 REDSHIFT binsize : 1.000 (NZBIN=4) 
+	 AV range from -3.00 to 3.00 
+	 AV binsize : 3.00  (NAVBIN=3) 
+	 RV = A(V)/E(B-V) : 3.10  and CCM89 law 
+	 (Use 1994 ODonnell update for optical/NIR)
+	 AV option : 2  =>  convolve Kcor * A(lam)  
+	 MW Extinction slope measured at E(B-V)= 0.10 
+	 User SN LAMBDA range from    300 to  20000 Angstroms 
+	 User SN Trest range from    -30 to    100 days 
+
+  Done reading user input file.
+
+	 OUTFILE: kcor_HST_AB.fits  ->  FITS format
+
+  ***** READ FILTER TRANSMISSIONS ***** 
+	 Filter ACS_WFC_F435W-B : 1520 values from  2949 to 10544 A, <lam>= 4329 
+	 Filter ACS_WFC_F475W-G : 1418 values from  3460 to 10545 A, <lam>= 4766 
+	 Filter ACS_WFC_F606W-V : 1520 values from  2950 to 10545 A, <lam>= 5960 
+	 Filter ACS_WFC_F625W-R : 1510 values from  2950 to 10495 A, <lam>= 6325 
+	 Filter ACS_WFC_F775W-X : 1314 values from  3950 to 10515 A, <lam>= 7705 
+	 Filter ACS_WFC_F814W-I : 1340 values from  3950 to 10645 A, <lam>= 8084 
+	 Filter ACS_WFC_F850LP-Z : 1405 values from  3950 to 10970 A, <lam>= 9049 
+	 Filter WFC3_UVIS_F225W-S : 1823 values from  1939 to 11049 A, <lam>= 2364 
+	 Filter WFC3_UVIS_F275W-T : 1821 values from  1949 to 11049 A, <lam>= 2709 
+	 Filter WFC3_UVIS_F336W-U : 189 values from  2949 to  3889 A, <lam>= 3359 
+	 Filter WFC3_UVIS_F390W-C : 1823 values from  1939 to 11049 A, <lam>= 3932 
+	 Filter WFC3_UVIS_F350LP-W : 1823 values from  1939 to 11049 A, <lam>= 6076 
+	 Filter WFC3_UVIS_F689M-6 : 1823 values from  1940 to 11050 A, <lam>= 6879 
+	 Filter WFC3_UVIS_F763M-7 : 1823 values from  1940 to 11050 A, <lam>= 7617 
+	 Filter WFC3_UVIS_F845M-8 : 1823 values from  1940 to 11050 A, <lam>= 8441 
+	 Filter WFC3_IR_F105W-Y : 2021 values from  7949 to 18049 A, <lam>=10584 
+	 Filter WFC3_IR_F110W-M : 2021 values from  7949 to 18049 A, <lam>=11624 
+	 Filter WFC3_IR_F125W-J : 2021 values from  7949 to 18049 A, <lam>=12516 
+	 Filter WFC3_IR_F140W-N : 2021 values from  7949 to 18049 A, <lam>=13970 
+	 Filter WFC3_IR_F160W-H : 2021 values from  7949 to 18049 A, <lam>=15392 
+	 Filter F110W_NIC2-E : 1677 values from  7610 to 15990 A, <lam>=11402 
+	 Filter F160W_NIC2-F : 1603 values from 11980 to 19990 A, <lam>=16103 
+	 Filter WFC3_IR_F098M-L : 2021 values from  7950 to 18050 A, <lam>= 9873 
+	 Filter WFC3_IR_F127M-O : 2021 values from  7950 to 18050 A, <lam>=12742 
+	 Filter WFC3_IR_F139M-P : 2021 values from  7950 to 18050 A, <lam>=13843 
+	 Filter WFC3_IR_F153M-Q : 2021 values from  7950 to 18050 A, <lam>=15334 
+
+ Global range of all filters: 1939 to 19990 A 
+
+
+  ***** READ Supernova SED TEMPLATES ***** 
+  Read  K-cor  SED  from : 
+    /usr/local/SNDATA_ROOT/snsed/Hsiao07.extrap.dat 
+  Finished reading Hsiao07.extrap.dat 
+  Found 106 epochs from day -20.0 to 85.0 . 
+  Each epoch has 1971 lambda bins with binsize = 10.00 A . 
+  Spectra stored between    300 and  20000 A . 
+
+
+  ***** READ AB SED (INDX=3) ***** 
+	 Opened : /usr/local/SNDATA_ROOT/standards/flatnu.dat 
+   Read 3079 lambda bins from 1702 to 20162 A  
+   Re-bin AB to uniform (10 A) lambda bins from 1940 to 19990 A
+
+ ***** Compute AB flux in each filter ***** 
+
+                                            syn                    
+                                flux        AB     system  final  
+         filter      (system) (Nph/s/cm^2)  mag      ZPoff    ZP    
+  ------------------------------------------------------------------ 
+     ACS_WFC_F435W-B (    AB)   4.039e+05   0.0036   0.000   0.000  
+     ACS_WFC_F475W-G (    AB)   5.844e+05   0.0036   0.000   0.000  
+     ACS_WFC_F606W-V (    AB)   8.700e+05   0.0036   0.000   0.000  
+     ACS_WFC_F625W-R (    AB)   5.078e+05   0.0036   0.000   0.000  
+     ACS_WFC_F775W-X (    AB)   4.066e+05   0.0036   0.000   0.000  
+     ACS_WFC_F814W-I (    AB)   5.253e+05   0.0036   0.000   0.000  
+    ACS_WFC_F850LP-Z (    AB)   1.906e+05   0.0036   0.000   0.000  
+   WFC3_UVIS_F225W-S (    AB)   1.131e+05   0.0036   0.000   0.000  
+   WFC3_UVIS_F275W-T (    AB)   1.058e+05   0.0036   0.000   0.000  
+   WFC3_UVIS_F336W-U (    AB)   1.640e+05   0.0036   0.000   0.000  
+   WFC3_UVIS_F390W-C (    AB)   3.139e+05   0.0036   0.000   0.000  
+  WFC3_UVIS_F350LP-W (    AB)   1.324e+06   0.0036   0.000   0.000  
+   WFC3_UVIS_F689M-6 (    AB)   1.345e+05   0.0036   0.000   0.000  
+   WFC3_UVIS_F763M-7 (    AB)   1.062e+05   0.0036   0.000   0.000  
+   WFC3_UVIS_F845M-8 (    AB)   7.164e+04   0.0036   0.000   0.000  
+     WFC3_IR_F105W-Y (    AB)   7.101e+05   0.0036   0.000   0.000  
+     WFC3_IR_F110W-M (    AB)   1.183e+06   0.0036   0.000   0.000  
+     WFC3_IR_F125W-J (    AB)   6.950e+05   0.0035   0.000   0.000  
+     WFC3_IR_F140W-N (    AB)   8.488e+05   0.0035   0.000   0.000  
+     WFC3_IR_F160W-H (    AB)   5.312e+05   0.0036   0.000   0.000  
+        F110W_NIC2-E (    AB)   2.376e+05   0.0036   0.000   0.000  
+        F160W_NIC2-F (    AB)   2.093e+05   0.0036   0.000   0.000  
+     WFC3_IR_F098M-L (    AB)   4.140e+05   0.0036   0.000   0.000  
+     WFC3_IR_F127M-O (    AB)   1.599e+05   0.0035   0.000   0.000  
+     WFC3_IR_F139M-P (    AB)   1.379e+05   0.0035   0.000   0.000  
+     WFC3_IR_F153M-Q (    AB)   1.339e+05   0.0036   0.000   0.000  
+  ----------------------------------------------------------------- 
+
+ Finished  kcor_ini  
+
+
+ ***** Compute SN magnitude in each filter/epoch ***** 
+
+ 
+                                Synth MAG   Synth    
+         filter      (system)   at T=0      DM15    
+  --------------------------------------------------------- 
+     ACS_WFC_F435W-B (    AB)   -0.131     1.046
+     ACS_WFC_F475W-G (    AB)   -0.036     0.791
+     ACS_WFC_F606W-V (    AB)    0.138     0.620
+     ACS_WFC_F625W-R (    AB)    0.162     0.666
+     ACS_WFC_F775W-X (    AB)    0.747     0.724
+     ACS_WFC_F814W-I (    AB)    0.722     0.583
+    ACS_WFC_F850LP-Z (    AB)    0.683     0.390
+   WFC3_UVIS_F225W-S (    AB)    3.756     2.097
+   WFC3_UVIS_F275W-T (    AB)    2.292     2.096
+   WFC3_UVIS_F336W-U (    AB)    0.618     1.915
+   WFC3_UVIS_F390W-C (    AB)    0.003     1.283
+  WFC3_UVIS_F350LP-W (    AB)    0.167     0.800
+   WFC3_UVIS_F689M-6 (    AB)    0.435     0.733
+   WFC3_UVIS_F763M-7 (    AB)    0.783     0.662
+   WFC3_UVIS_F845M-8 (    AB)    0.674     0.511
+     WFC3_IR_F105W-Y (    AB)    1.013     0.779
+     WFC3_IR_F110W-M (    AB)    1.089     1.000
+     WFC3_IR_F125W-J (    AB)    1.178     1.583
+     WFC3_IR_F140W-N (    AB)    1.425     1.364
+     WFC3_IR_F160W-H (    AB)    1.710     0.789
+        F110W_NIC2-E (    AB)    1.039     0.923
+        F160W_NIC2-F (    AB)    1.652     0.592
+     WFC3_IR_F098M-L (    AB)    0.954     0.517
+     WFC3_IR_F127M-O (    AB)    1.144     1.685
+     WFC3_IR_F139M-P (    AB)    1.464     1.605
+     WFC3_IR_F153M-Q (    AB)    1.718     0.563
+  ----------------------------------------------------- 
+
+  ***** START LOOPING for KCOR GRID ***** 
+
+ wr_fits: WRITE CALIB/KCOR TO 'kcor_HST_AB.fits' 
+	 wr_fits_HEAD: write header info.
+	 wr_fits_ZPT: write ZPT info 
+	 wr_fits_SNSED: write SN SED 
+	 wr_fits_KCOR: write KCOR tables 
+	 wr_fits_MAGS: write MAG+MWXT tables 
+	 wr_fits_FilterTrans: write filter transmissions. 
+	 wr_fits_PRIMARY: write Primary SED(s) 
+
+ Program stopping gracefully. Bye. 

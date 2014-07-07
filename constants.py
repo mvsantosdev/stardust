@@ -86,7 +86,8 @@ from copy import deepcopy
 HST = SurveyData()
 HST.SURVEYNAME='HST'
 HST.FIELDNAME = 'default'
-HST.KCORFILE = 'HST/kcor_HST.fits' # no k-corrections. Usable with SALT2 and NON1A only
+HST.KCORFILE = 'HST/kcor_HST_AB.fits' # no k-corrections. Usable with SALT2 and NON1A only
+HST.MAGREF = 'AB'
 HST.IAMODEL = 'SALT2.Guy10_UV2IR' # or mlsc2k2 or snoopy, etc.
 HST.NONIAMODEL = 'NON1A'   # NON1A or non1a
 HST.CAMERAS = ['ACS','UVIS','IR']  # Full-length camera names
@@ -94,7 +95,7 @@ HST.CAMERABANDLIST={'ACS':'BGVRXIZ','UVIS':'DSTUWC78','IR':'YMJNHLOPQEF'}
 HST.ALLBANDS = 'DSTUWC78BGVRXIZYMJNHLOPQEF'
 HST.BANDORDER = HST.ALLBANDS 
 HST.BANDMARKER = {
-    'S':'^','T':'^','U':'^','C':'^','W':'o',
+    'S':'^','T':'^','U':'^','C':'^','W':'o','7':'1','8':'2',
     'B':'<','G':'h','V':'<','R':'^','X':'o','I':'>','Z':'s',
     'Y':'o','M':'v','J':'s','N':'H','H':'D',
     'E':'o','F':'o',
@@ -104,6 +105,7 @@ HST.BANDCOLOR =  {
     # color-blind barrier free pallette from 
     #    http://people.apache.org/~crossley/cud/cud.html
     'S':'DarkMagenta','T':'DarkOrchid','U':'DeepPink','C':'HotPink',
+    '7':'Teal','8':'DarkOrange',
     'B':'DarkSlateBlue','G':'ForestGreen','R':maroon,'X':khaki,
     'E':'DarkCyan','F':'DarkRed','M':khaki, 
     'L':'DarkTurquoise','O':'DarkSlateGrey','P':'SeaGreen','Q':'Brown',
@@ -116,6 +118,7 @@ HST.CAMERABANDLIST = {'ACS':['B','G','V','R','X','I','Z'],
                       'UVIS':['D','S','T','U','W','C','7','8'] }
 HST.FILTER2BAND = { 'F218W':'D','F225W':'S','F275W':'T',#'F300X':'E',
                     'F336W':'U','F390W':'C','F350LP':'W',
+                    'F763M':'7','F845M':'8',
                     'F435W':'B','F475W':'G','F606W':'V','F625W':'R',#'F555W':'F',
                     'F775W':'X','F814W':'I','F850LP':'Z',
                     'F125W':'J','F160W':'H','F125W+F160W':'A',
@@ -141,16 +144,42 @@ HST.GAIN = {'a':2.0, 'u':1.6, 'i':2.5,
 HST.RDNOISE = {'ACS':60.22,'UVIS':75.96,'IR':114.28}   # e- 
 HST.PSF_FWHM_ARCSEC = { 'ACS': 0.13,'UVIS':0.07, 'IR':0.15 } # PSF FWHM in arcsec
 HST.PIXSCALE = { 'ACS': 0.05, 'UVIS':0.04, 'IR':0.13, 'default':0.13 } # Native pixel scale in arcsec per pixel
-HST.ZEROPOINT = {  # 0.4"  aperture, Vega mags
-    'UVIS':{'F350LP':26.6852,'F218W':21.0878,'F225W':22.2034,'F275W':22.4757,
-            'F336W':23.3531,'F390W':25.0240,},
-    'IR':{'F105W':25.452,'F110W':25.8829,'F125W':25.1439,'F140W':25.1845,'F160W':24.5037,
-          'F098M':24.9424,'F127M':23.4932,'F139M':23.2093,'F153M':23.0188,
-          'N110W':22.77  ,'N160W':21.95 },
-    'ACS':{'F435W':25.76695,'F475W':26.16252,'F555W':25.72747,'F606W':26.40598,
-           'F625W':25.74339,'F775W':25.27728,'F814W':25.51994,'F850LP':24.3230, }
+# NOTE : NIC2 F160W and F110W zero points below were computed following the DHB
+# http://www.stsci.edu/hst/nicmos/documents/handbooks/DataHandbookv8/nic_ch5.9.3.html#328526
+# Alternate NIC2 Vegamag zeropoints of unknown provenance (possibly from A.Riess? )
+#    'N110W':22.77  ,'N160W':21.95 },
+HST.ZEROPOINT_AB = {  # infinite  aperture, AB mags
+    'UVIS':{'F350LP':26.9435,'F218W':22.9641,'F225W':24.0403,
+            'F275W':24.1305,'F336W':24.6682,'F390W':23.3562,
+            'F689M':24.4641,'F763M':24.2070,'F845M':23.7811 },
+    'IR':{'F105W':26.2687,'F110W':26.8223,'F125W':26.2303,
+          'F140W':26.4524,'F160W':25.9463,'F098M':25.6674,
+          'F127M':24.6412,'F139M':24.4793,'F153M':24.4635,
+          'F126N':22.8609,'F128N':22.9726,'F130N':22.9900,
+          'F132N':22.9472,'F164N':22.9089,'F167N':22.9568,
+          'N110W':23.69195,'N160W':23.462779 },
+    'ACS':{'F435W':25.665,'F475W':26.056,'F550M':24.857,
+           'F555W':25.711,'F606W':26.493,'F625W':25.899,
+           'F775W':25.662,'F814W':25.947,'F850LP':24.857}
     }
-HST.SOLIDANGLE = {  # Field size in square arcmin converted to steradians 
+HST.ZEROPOINT_VEGA = {  # infinite  aperture, Vega mags
+    'ACS':{'F435W':25.76695,'F475W':26.16252,'F555W':25.72747,'F606W':26.40598,
+           'F625W':25.74339,'F775W':25.27728,'F814W':25.51994,'F850LP':24.3230},
+    'IR':{'F105W':25.6236,'F110W':26.0628,'F125W':25.3293,
+          'F140W':25.3761,'F160W':24.6949,'F098M':25.1057,
+          'F127M':23.6799,'F139M':23.4006,'F153M':23.2098,
+          'F126N':21.9396,'F128N':21.9355,'F130N':22.0138,
+          'F132N':21.9499,'F164N':21.5239,'F167N':21.5948,
+          'N110W':22.9643,'N160W':22.15325 },
+    'UVIS':{'F350LP':26.7874,'F218W':21.2743,'F225W':22.3808,
+            'F275W':22.6322,'F336W':23.4836,'F390W':25.1413,
+            'F689M':24.1873,'F763M':23.8283,'F845M':23.2809 }
+    }
+if HST.MAGREF=='AB' or HST.KCORFILE.endswith('AB.fits') :
+    HST.ZEROPOINT = HST.ZEROPOINT_AB
+else :
+    HST.ZEROPOINT = HST.ZEROPOINT_VEGA
+HST.SOLIDANGLE = {  # Field size in square arcmin converted to steradians
     'gnd':77.54*arcmin2steradian,'gnw':(38.7 + 41.4)*arcmin2steradian,
     'gsd':66.5*arcmin2steradian, 'gsw':39.4*arcmin2steradian,
     'cos':196.8*arcmin2steradian,'uds':207.1*arcmin2steradian,
@@ -205,14 +234,14 @@ HST.FLTWAVE = { 'S':2250, 'T':2750, 'U':3360, 'C':3900,
 
 CANDELS = deepcopy( HST ) 
 CANDELS.SURVEYNAME='CANDELS'
-CANDELS.BANDMARKER = {
+CANDELS.BANDMARKER.update( {
     'S':'^','T':'^','U':'^','C':'^','W':'o',
     'B':'s','G':'s','R':'s','X':'o',
     'V':'<','I':'>','Z':'^',
     'Y':'p','M':'o','J':'s','N':'H','H':'D',
     'E':'o','F':'o',
-    'L':'1','O':'2','P':'3','Q':'4' }
-CANDELS.BANDCOLOR =  {
+    'L':'1','O':'2','P':'3','Q':'4' } )
+CANDELS.BANDCOLOR.update({
     # color-blind barrier free pallette from 
     #    http://people.apache.org/~crossley/cud/cud.html
     'S':'DarkMagenta','T':'DarkOrchid','U':'DeepPink','C':'HotPink',
@@ -221,74 +250,28 @@ CANDELS.BANDCOLOR =  {
     'L':'DarkTurquoise','O':'DarkSlateGrey','P':'SeaGreen','Q':'Brown',
     'V':'#009e73','I':'#cc79a7','Z':'#e69f00',
     'W':'k','J':'#0072b2','H':'#d55e00',
-    'Y':'#56b4e9','N':'#009e73', }
+    'Y':'#56b4e9','N':'#009e73', })
 
 #============================================================
 
-FRONTIER = SurveyData()
+FRONTIER = deepcopy( HST )
 FRONTIER.SURVEYNAME='FRONTIER'
 FRONTIER.FIELDNAME = 'WFC3-CORE'
-FRONTIER.KCORFILE = 'HST/kcor_HST.fits' # no k-corrections. Usable with SALT2 and NON1A only
-FRONTIER.IAMODEL = 'SALT2.Guy10_UV2IR' # or mlsc2k2 or snoopy, etc.
-FRONTIER.NONIAMODEL = 'NON1A'   # NON1A or non1a
-FRONTIER.CAMERAS = ['ACS','UVIS','IR']  # Full-length camera names
-FRONTIER.CAMERABANDLIST={'ACS':'BVIZ','UVIS':'TUW78','IR':'YMJNHLOPQ'}
-FRONTIER.ALLBANDS = 'BVIYJNH'
-FRONTIER.BANDORDER = FRONTIER.ALLBANDS 
-FRONTIER.BANDCOLOR =  {
+FRONTIER.BANDCOLOR.update({
     'S':'DarkMagenta','T':'DarkOrchid','U':'DeepPink','C':'HotPink','W':'k',
     'B':'DarkSlateBlue','G':'ForestGreen','V':'Teal','R':'FireBrick',
     'X':'RoyalBlue','I':'Orange','Z':'Red',
     'Y':'DarkCyan','M':'DarkBlue','J':'Chocolate','N':'LimeGreen','H':'MediumOrchid',
     'E':'DarkCyan','F':'DarkRed',
-    'L':'DarkTurquoise','O':'DarkSlateGrey','P':'SeaGreen','Q':'Brown' }
-FRONTIER.BANDMARKER = {
+    'L':'DarkTurquoise','O':'DarkSlateGrey','P':'SeaGreen','Q':'Brown' })
+FRONTIER.BANDMARKER.update({
     'S':'^','T':'^','U':'^','C':'^','W':'^',
     'B':'s','G':'s','V':'s','R':'s',
     'X':'o','I':'s','Z':'s',
     'Y':'o','M':'o','J':'o','N':'>','H':'d',
     'E':'o','F':'o',
-    'L':'d','O':'d','P':'d','Q':'d' }
-FRONTIER.DARKCURRENT={'ACS':0.006,'UVIS':0.0005,'IR':0.05}# e- /pix /sec
-FRONTIER.CAMERABANDLIST = {'ACS':['B','G','V','R','X','I','Z'], 
-                      'IR':['H','J','Y','M','N','L','O','P','Q','E','F'],
-                      'UVIS':['D','S','T','U','W','C','7','8'] }
-FRONTIER.FILTER2BAND = { 'F218W':'D','F225W':'S','F275W':'T',#'F300X':'E',
-                    'F336W':'U','F390W':'C','F350LP':'W',
-                    'F435W':'B','F475W':'G','F606W':'V','F625W':'R',#'F555W':'F',
-                    'F775W':'X','F814W':'I','F850LP':'Z',
-                    'F125W':'J','F160W':'H','F125W+F160W':'A',
-                    'F105W':'Y','F110W':'M','F140W':'N',
-                    'F098M':'L','F127M':'O','F139M':'P','F153M':'Q',
-                    'G141':'4','G102':'2','blank':'0'
-                    }
-FRONTIER.SKYCPS = {'F218W':0.0005,'F225W':0.0066,'F275W':0.0037,'F336W':0.0018,
-              'F350LP':0.1077,'F390W':0.0098,
-              'F850LP':0.039,'F775W':0.078,'F625W':0.083,'F606W':0.127,
-              'F555W':0.054,'F475W':0.057,'F435W':0.030,'F814W':0.102,
-              'F098M':0.6106,'F105W':1.0150,'F110W':1.6611,'F125W':1.112,
-              'F127M':0.2697,'F139M':0.2391,'F140W':1.1694,
-              'F153M':0.2361,'F160W':0.943, 
-              'N110W':1.6611,'N160W':0.943, }
-# Detector "Gain" (really Inverse Gain) for each camera, in e- / ADU
-FRONTIER.GAIN = {'a':2.0, 'u':1.6, 'i':2.5, 
-            'ACS':2.0, 'UVIS':1.6, 'IR':2.5 }
-# From instrument handbooks, read noise per pixel:
-# FRONTIER.RDNOISE = {'ACS':4.8,'UVIS':3.2,'IR':17}   # e-/pix 
-# Read noise in 0.4" aperture (from ETC)
-FRONTIER.RDNOISE = {'ACS':60.22,'UVIS':75.96,'IR':114.28}   # e- 
-FRONTIER.PSF_FWHM_ARCSEC = { 'ACS': 0.13,'UVIS':0.07, 'IR':0.15 } # PSF FWHM in arcsec
-FRONTIER.PIXSCALE = { 'ACS': 0.05, 'UVIS':0.04, 'IR':0.13, 'default':0.13 } # Native pixel scale in arcsec per pixel
-FRONTIER.ZEROPOINT = {  # 0.4"  aperture, Vega mags
-    'UVIS':{'F350LP':26.6852,'F218W':21.0878,'F225W':22.2034,'F275W':22.4757,
-            'F336W':23.3531,'F390W':25.0240,},
-    'IR':{'F105W':25.452,'F110W':25.8829,'F125W':25.1439,'F140W':25.1845,'F160W':24.5037,
-          'F098M':24.9424,'F127M':23.4932,'F139M':23.2093,'F153M':23.0188,
-          'N110W':22.77  ,'N160W':21.95 },
-    'ACS':{'F435W':25.76695,'F475W':26.16252,'F555W':25.72747,'F606W':26.40598,
-           'F625W':25.74339,'F775W':25.27728,'F814W':25.51994,'F850LP':24.3230, }
-    }
-FRONTIER.SOLIDANGLE = {  # Field size in square arcmin converted to steradians 
+    'L':'d','O':'d','P':'d','Q':'d' })
+FRONTIER.SOLIDANGLE = {  # Field size in square arcmin converted to steradians
     'WFC3-CORE': 6 * 4.6 * 8.461595e-08,
     'ACS-WINGS': 6 * 6.4 * 8.461595e-08,
     'default': 6 * 4.6 * 8.461595e-08,
@@ -341,6 +324,7 @@ SNLS.TELESCOPE = 'CFHT'
 SNLS.CAMERAS = ['MEGACAM',]
 SNLS.FILTERS = 'griz'
 SNLS.KCORFILE = 'SNLS3year/kcor_EFFMEGACAM_BD17.fits'
+SNLS.MAGREF = 'BD17'
 SNLS.IAMODEL = 'SALT2.Guy10_UV2IR'
 SNLS.NONIAMODEL = 'NON1A'   
 SNLS.ALLBANDS = 'griz'
@@ -380,6 +364,7 @@ DES.TELESCOPE = 'CTIO'
 DES.CAMERAS = ['DECAM',]
 DES.FILTERS = 'grizY'
 DES.KCORFILE = 'DES/kcor_DES_grizY.fits'
+DES.MAGREF = 'AB'
 DES.IAMODEL = 'SALT2.Guy10_UV2IR'
 DES.NONIAMODEL = 'NON1A'   
 DES.ALLBANDS = 'grizY'

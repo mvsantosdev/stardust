@@ -19,10 +19,10 @@ import glob
 import constants
 
 # #KCORFILE = 'HST/kcor_HST_VXIZWJH.his' 
-# KCORFILE = { 'HST':'HST/kcor_HST.fits',   # no k-corrections. Usable with SALT2 and NON1A only
+# KCORFILE = { 'HST':'HST/kcor_HST_AB.fits',   # no k-corrections. Usable with SALT2 and NON1A only
 #              'SNLS':'SNLS/kcor_EFFMEGACAM_BD17.fits' }
 IAMODEL = 'SALT2.Guy10_UV2IR'    # or mlsc2k2 or salt2, etc.
-# #KCORFILE = 'HST/kcor_HST.fits'   # no k-corrections. Usable with SALT2 and NON1A only
+# #KCORFILE = 'HST/kcor_HST_AB.fits'   # no k-corrections. Usable with SALT2 and NON1A only
 # #IAMODEL = 'SNOOPY'
 # 
 # # non1a: rest-frame mag + K-correction (requires separate kcor table for each non1a model)
@@ -260,20 +260,22 @@ def getNctrl( survey='HST', field='all', dustmodel='mid',
                 Nctrldz05['%s.%s.%s'%(field,dustmodel,zstr)] = Ndetz * float(sim.NSNSURVEY) / Nsim / areascale
                 if verbose : print( "%.2f  %.2f   %.3f"%( zrange[0], zrange[1], Nctrlz ) )
             
-    if showplots : 
-        from matplotlib import pyplot as p
-        # Distribution of all SNe exploding in this volume
-        # (the total number here depends on the user-defined Nsim=NGENTOT_LC)
-        zbinsplot=np.arange(0,3.,0.1)
-        Nall,zall = np.histogram( sim.DUMP['Z'], bins=zbinsplot )
-        Nallsurvey = Nall * normfactor
-        Ndetsurvey = Ndet * normfactor
-        p.clf()
-        p.plot( zbinsplot[1:], Nallsurvey, drawstyle='steps-post', color='b', label=r'%i total SNe in survey volume \& time'%sim.NSNSURVEY )
-        p.plot( zbinsplot[1:], Ndetsurvey, drawstyle='steps-post', color='r', label='%i detectable SNe'%Ndetsurvey.sum() )
-        p.xlabel('redshift')
-        p.ylabel('Number of SNe')
-        p.legend( loc='upper left', frameon=False, numpoints=3, borderpad=0.2)
+                if showplots :
+                    from matplotlib import pyplot as p
+                    # Distribution of all SNe exploding in this volume
+                    # (the total number here depends on the user-defined Nsim=NGENTOT_LC)
+                    zbinsplot=np.arange(0,3.,0.1)
+                    Nall,zall = np.histogram( sim.DUMP['Z'], bins=zbinsplot )
+                    Nallsurvey = Nall / Nsim / areascale
+                    idet = sim.DUMP['idet']
+                    Ndet,zdet = np.histogram( sim.DUMP['Z'][idet], bins=zbinsplot )
+                    Ndetsurvey = Ndet / Nsim / areascale
+                    p.clf()
+                    p.plot( zbinsplot[1:], Nallsurvey, drawstyle='steps-post', color='b', label=r'%i total SNe in survey volume \& time'%sim.NSNSURVEY )
+                    p.plot( zbinsplot[1:], Ndetsurvey, drawstyle='steps-post', color='r', label='%i detectable SNe'%Ndetsurvey.sum() )
+                    p.xlabel('redshift')
+                    p.ylabel('Number of SNe')
+                    p.legend( loc='upper left', frameon=False, numpoints=3, borderpad=0.2)
 
     # collapse all the fields to get Nctrl for each dust model
     # report everything : 
@@ -435,7 +437,7 @@ FIELD: %s
         for mjd, etime in zip(mjdlist[iband],etimelist[iband]) :
             if perfect : 
                 skysig = 1
-                zpt = 100
+                zpt = 40
             else : 
                 skysig = SURVEYDATA.skynoise( camera, band, etime )
                 zpt = SURVEYDATA.zptsnana( camera, band, etime ) 
@@ -485,60 +487,6 @@ DONE.
     fout.close()
 
     return( simlibfile )
-
-def ccdnoise( bandlist='VIZWJH', etimelist=[550,400,400,430,525,525],
-              nexplist=[2,5,5,1,2,2] ):
-    """ compute the total detector noise (Read-noise and dark-noise) 
-    in e-/pix for the combined exposure length in each band """
-    from math import sqrt
-    noise = {}
-    for band, etime, nexp  in zip(bandlist,etimelist, nexplist) : 
-        if band in ACSbandlist : cam = 'ACS'
-        elif band in IRbandlist : cam = 'IR'
-        elif band in UVISbandlist : cam = 'UVIS'
-        noise[band] = sqrt( (RDNOISE[cam]*nexp)**2 + DARKCURRENT[cam]*etime*nexp )
-    return( noise )
-
-
-
-def filter2band( filter ):
-    """ convert a full ACS or WFC3 filter string into its 
-    single-digit alphabetic code.  e.g:
-      filter2band('F125W')  ==>  'J'
-    """
-    import exceptions
-    if filter in FilterAlpha.keys(): 
-        return( FilterAlpha[filter] )
-    else : 
-        raise exceptions.RuntimeError(
-            "Unknown filter %s"%filter )
-
-def band2filter( alpha ):
-    """ convert a single-digit alphabetic bandpass code 
-    into a full ACS or WFC3 filter string. e.g:
-      band2filter('J') ==> 'F125W'
-    """
-    import exceptions
-    alpha = alpha.upper()
-    for filter in FilterAlpha.keys(): 
-        if FilterAlpha[filter] == alpha : 
-            return( filter )
-    else : 
-        raise exceptions.RuntimeError(
-            "Unknown filter %s"%alpha )
-
-def band2zpt( alpha ) :
-    return( ZPT04_VEGA[ band2filter( band ) ] )
-
-def band2cam( band ) :
-    if band in ACSbandlist : return( 'a' )
-    elif band in UVISbandlist : return( 'u' )
-    elif band in IRbandlist : return('i') 
-
-def band2camera( band ) :
-    if band in ACSbandlist : return( 'ACS' )
-    elif band in UVISbandlist : return( 'UVIS' )
-    elif band in IRbandlist : return('IR') 
 
 
 def mkinputGrid( simname,  inputfile=None, simlibfile=None,
@@ -816,7 +764,7 @@ DNDZ: POWERLAW2 1.089E-7  0.0   0.7   9.1  # rate = constant for z>0.8
         # simple flat distribution in redshift
         inputtext += """
 #SN Rate vs redshift:
-DNDZ: FLAT             # flat rate at all z
+DNDZ: POWERLAW  1.0E-4  0.0      # flat rate at all z
 """
 
     if type(pardict['GENFILTERS'])==list : 
@@ -855,7 +803,7 @@ SEARCHEFF_PIPELINE_FILE: %s  # in $SNDATA_ROOT/models/searcheff/
 # CID LIBID RA DECL MWEBV MWEBVMAP MWEBVERR ZCMB_SMEAR ZCMB ZHELIO VPEC Z GENZ MU DLMAG GALID GALZTRUE GALZPHOT GALZPH GALZERR GALSNSEP GALSNDM GALWGT PEAKMJD MJD0 MAGT0_H MAGT0_J MAGT0_W AV RV DELTA DM15 S2alpha SALT2alpha S2beta SALT2beta S2x0 SALT2x0 S2x1 SALT2x1 S2c SALT2c S2mb SALT2mb MAGSMEAR_COH VSI COLORSHIFT0 COLORSHIFT1 COLORSHIFT2 COLORSHIFT3 COLORSHIFT4 TRISE_SHIFT TFALL_SHIFT GENTYPE SNTYPE NON1A_INDEX NOBS NOBSDIF NEPOCH
 #
 # From CUTWIN-ANALYSIS: 
-# REDSHIFT_FINAL TRESTMIN TMIN TRESTMAX TMAX SNRMAX SNRMAX1 SNRMAX2 SNRMAX3 SNRMAX4 SNRMAX5 SNRMAX_H SNRMAX_J SNRMAX_W TGAPMAX T0GAPMAX CUTMASK SIM_EFFMASK SIM_SEARCHEFF_MASK
+# REDSHIFT_FINAL TRESTMIN TMIN TRESTMAX TMAX SNRMAX SNRMAX1 SNRMAX2 SNRMAX3 SNRMAX4 SNRMAX5 SNRMAX_H SNRMAX_J SNRMAX_W TGAPMAX T0GAPMAX CUTMASK SIMEFMSK SIM_SEARCHEFF_MASK
 #
 #SNRMAX = max S/N ratio, across all bands
 #SNRMAX1 = max S/N ratio, from the band with the highest SNR = SNRMAX
@@ -863,7 +811,7 @@ SEARCHEFF_PIPELINE_FILE: %s  # in $SNDATA_ROOT/models/searcheff/
 #etc.
   
 #Dump out a summary .DUMP text file
-SIMGEN_DUMP: %i CID LIBID SIM_EFFMASK Z MU SNTYPE NON1A_INDEX  PEAKMJD AV RV S2x0 S2x1 S2c S2mb %s %s
+SIMGEN_DUMP: %i CID LIBID SIMEFMSK Z MU SNTYPE NON1A_INDEX  PEAKMJD AV RV S2x0 S2x1 S2c S2mb %s %s
 
 #  stop sim when effic error is this small (avoid infinite loops)
 EFFERR_STOPGEN:	0.001
@@ -1185,6 +1133,10 @@ def plotzGrid( showerr=False ):
     from matplotlib import pyplot as pl
 
     simIa = SimTable('snIa_zGrid')
+    if simIa.MAGREF=='AB' or simIa.SURVEYDATA.KCORFILE.endswith('AB.fits') :
+        magsystem = 'AB'
+    else :
+        magsystem = 'Vega'
     z = simIa.z
     I = np.ma.masked_greater_equal( simIa.LCMATRIX[:,:,:,:,3,:], 32 )
     V = np.ma.masked_greater_equal( simIa.LCMATRIX[:,:,:,:,2,:], 32 )
@@ -1225,7 +1177,7 @@ def plotzGrid( showerr=False ):
 
     ax = pl.gca()
     pl.xlabel('Redshift')
-    pl.ylabel( 'V-I color (Vega)')
+    pl.ylabel( 'V-I color (%s)'%magsystem)
     pl.text( 0.95, 0.95, 'Type Ia', color='r',  fontsize='large', fontweight='bold', ha='right', va='top', transform=ax.transAxes )
     pl.text( 0.95, 0.9, 'Type Ib/c', color='g', fontsize='large',  fontweight='bold', ha='right', va='top', transform=ax.transAxes )
     pl.text( 0.95, 0.85, 'Type II', color='b',  fontsize='large', fontweight='bold', ha='right', va='top', transform=ax.transAxes )

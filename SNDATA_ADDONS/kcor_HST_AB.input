@@ -1,0 +1,80 @@
+# To generate a kcor .fits file for use with rest-frame models (SALT2, NON1A) use : 
+#   kcor.exe kcor_HST.input SKIPKCOR
+
+# To actually generate the kcorrection tables (for mlcs2k2, snoopy) 
+# use the kcor_HST_ALL.input: 
+#   kcor.exe kcor_HST_ALL.input
+
+
+# ======================== BEGIN INPUT  =========================
+#specify spectral template for supernova
+#SN_SED: Hsiao07.dat  
+# This one has been extrapolated down to 300 angstroms
+SN_SED: Hsiao07.extrap.dat  
+
+# specify BD17 and Vega spectra
+BD17_SED:  bd17.dat
+VEGA_SED:  alpha_lyr_stis_003.dat   # synphot_vega.dat
+
+# specify filters :  
+MAGSYSTEM: AB     (define mag system for filters below)
+FILTSYSTEM: COUNT
+FILTPATH: HST/HST_CANDELS
+FILTER:   ACS_WFC_F435W-B      ACS_WFC_F435W.dat     0.000  B  (name, file, ZPoffset, band)
+FILTER:   ACS_WFC_F475W-G      ACS_WFC_F475W.dat     0.000  G
+FILTER:   ACS_WFC_F606W-V      ACS_WFC_F606W.dat     0.000  V
+FILTER:   ACS_WFC_F625W-R      ACS_WFC_F625W.dat     0.000  R
+FILTER:   ACS_WFC_F775W-X      ACS_WFC_F775W.dat     0.000  X
+FILTER:   ACS_WFC_F814W-I      ACS_WFC_F814W.dat     0.000  I
+FILTER:   ACS_WFC_F850LP-Z     ACS_WFC_F850LP.dat    0.000  Z
+
+FILTER:   WFC3_UVIS_F225W-S    WFC3_UVIS_F225W.dat   0.000  S
+FILTER:   WFC3_UVIS_F275W-T    WFC3_UVIS_F275W.dat   0.000  T
+FILTER:   WFC3_UVIS_F336W-U    WFC3_UVIS_F336W.dat   0.000  U
+FILTER:   WFC3_UVIS_F390W-C    WFC3_UVIS_F390W.dat   0.000  C
+FILTER:   WFC3_UVIS_F350LP-W   WFC3_UVIS_F350LP.dat  0.000  W
+FILTER:   WFC3_UVIS_F689M-6    WFC3_UVIS_F689M.dat   0.000  6
+FILTER:   WFC3_UVIS_F763M-7    WFC3_UVIS_F763M.dat   0.000  7
+FILTER:   WFC3_UVIS_F845M-8    WFC3_UVIS_F845M.dat   0.000  8
+
+FILTER:   WFC3_IR_F105W-Y      WFC3_IR_F105W.dat     0.000  Y
+FILTER:   WFC3_IR_F110W-M      WFC3_IR_F110W.dat     0.000  M
+FILTER:   WFC3_IR_F125W-J      WFC3_IR_F125W.dat     0.000  J
+FILTER:   WFC3_IR_F140W-N      WFC3_IR_F140W.dat     0.000  N
+FILTER:   WFC3_IR_F160W-H      WFC3_IR_F160W.dat     0.000  H
+
+FILTER:   F110W_NIC2-E			 NICMOS_NIC2_F110W.dat 0.000  E
+FILTER:   F160W_NIC2-F         NICMOS_NIC2_F160W.dat 0.000  F 
+
+FILTER:   WFC3_IR_F098M-L      WFC3_IR_F098M.dat     0.000  L
+FILTER:   WFC3_IR_F127M-O      WFC3_IR_F127M.dat     0.000  O
+FILTER:   WFC3_IR_F139M-P      WFC3_IR_F139M.dat     0.000  P
+FILTER:   WFC3_IR_F153M-Q      WFC3_IR_F153M.dat     0.000  Q
+
+
+# define output file for kcor grid
+OUTFILE: kcor_HST_AB.fits
+
+
+#  NOTE : We don't actually generate any K correction matrix
+# for the SALT2 and NON1A observer-frame models.  The resulting
+# .fits file will only carry the filter definitions, without
+#  any unnecessary kcor tables.
+#  The parameters below are defined just to avoid an ABORT.
+
+# define redshift grid for Kcor matrix.
+# Note that the "epoch" grid is taken automatically from the SN template.
+REDSHIFT_RANGE:   0.0  3.0
+REDSHIFT_BINSIZE: 1.0
+
+# define AV grid
+RV:          3.1   A(V)/E(B-V) 
+AV_RANGE:    -3.0  3.0
+AV_BINSIZE:  3.0
+AV_OPTION:   2   [1 => use AV at avg lambda in filter  (with CCM89)]
+                 [2 => convolve spectrum and extinction with CCM89 law]
+
+
+# define lambda range for SN templates; 
+# template lambda binning is used internally
+LAMBDA_RANGE: 300 20000
