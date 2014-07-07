@@ -3898,8 +3898,7 @@ class SuperNova( object ) :
         simlist = self.ClassSim
         postProblist = [ self.postProbIa, self.postProbIbc, self.postProbII ] 
 
-        from hstsnpipe.tools.figs import colors
-        colorlist = [colors.red,colors.green,colors.blue]        
+        colorlist = ['darkorange','forestgreen','cyan']
 
         for isim,sim,postProb,color in zip( [1,2,3], simlist, postProblist, colorlist ) : 
             isCC = isim>1  # Is this a CC sim?

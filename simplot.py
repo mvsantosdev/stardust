@@ -123,7 +123,7 @@ def plotSimClouds( sim, xaxis='W-H', yaxis='H', mjdrange=None, tsample=5.0,
     from math import sqrt, pi
     from matplotlib import cm
     from matplotlib.patches import FancyArrowPatch
-    from hstsnpipe.tools.figs import colors
+    import colors
 
     if mjdrange==None : 
         mjdpkmean = np.mean( sim.SIM_PEAKMJD ) 

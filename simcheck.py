@@ -10,7 +10,7 @@
 
 import os
 import sys
-from hstsnpipe.tools import snana
+import stardust
 import numpy as np
 from matplotlib import pyplot as pl
 from matplotlib import patches
@@ -136,7 +136,7 @@ def colorcheck_midz4():
 
 def colorCheck(datfile, nrow, irow, ifiglist=[1,2], clobber=False, verbose=1):
 
-    sn = snana.SuperNova(datfile )
+    sn = stardust.SuperNova(datfile )
     sn.getClassSim( 'HST_colormag', Nsim=2000, dustmodel='mid', simpriors=True, clobber=clobber, verbose=verbose ) 
 
     pkbands = np.unique([ sn.FLT[i] for i in range(len(sn.MJD)) if abs(sn.MJD[i]-sn.pkmjdobs)<=sn.pkmjdobserr ])

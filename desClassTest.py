@@ -107,10 +107,10 @@ def doOneSN( datfile, useLuminosityPrior=False, modelerror=[0.05,0.07, 0.07],
 
     if debug: import pdb; pdb.set_trace()
 
-    from hstsnpipe.tools import snana
+    import stardust
     start = time.time()
     try:
-        sn = snana.SuperNova( datfile )
+        sn = stardust.SuperNova( datfile )
         sn.PEAKMJD = sn.MJD[ sn.signoise.argmax() ]
 
         thistypeindex = int(sn.SIM_NON1a.split()[0])
@@ -133,8 +133,8 @@ def doOneSN( datfile, useLuminosityPrior=False, modelerror=[0.05,0.07, 0.07],
             pIa, pIbc, pII = sn.PIa,sn.PIbc,sn.PII
             chi2Ia, chi2Ibc, chi2II = min(sn.chi2Ia)/sn.Ndof,min(sn.chi2Ibc)/sn.Ndof,min(sn.chi2II)/sn.Ndof
             Ndof = sn.Ndof
-            bestIbc = snana.constants.IBCMODELS[ '%03i'%sn.maxLikeIbcModel.LUMIPAR ][1] 
-            bestII = snana.constants.IIMODELS[ '%03i'%sn.maxLikeIIModel.LUMIPAR ][1] 
+            bestIbc = stardust.constants.IBCMODELS[ '%03i'%sn.maxLikeIbcModel.LUMIPAR ][1]
+            bestII = stardust.constants.IIMODELS[ '%03i'%sn.maxLikeIIModel.LUMIPAR ][1]
 
         end = time.time()
 

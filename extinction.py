@@ -104,19 +104,18 @@ def lowIa( Av ) :
 
 def highIa_c( c ) : 
     """ the c distribution for the high Dust model for SNIa """
-    from hstsnpipe.tools.snana import bifgauss
+    from stardust import bifgauss
     return( bifgauss( c, 0, 0.08, 0.55) )
 
 def midIa_c( c ) : 
     """ the c distribution for the Mid Dust model for SNIa """
-    from hstsnpipe.tools.snana import bifgauss
     # from scipy.interpolate import interp1d
     gauss = lambda x,mu,sig : ( 1/np.sqrt(2*np.pi*sig**2) ) * np.exp(-(mu-x)**2/(2*sig**2))
     return( np.where( c<=-0.05, gauss(c,-0.05,0.05)/gauss(-0.05,-0.05,0.05), K09(c+0.05) ))
 
 def lowIa_c( c ) : 
     """ the c distribution for the Low Dust model for SNIa """
-    from hstsnpipe.tools.snana import bifgauss
+    from stardust import bifgauss
     return( bifgauss( c, -0.05, 0.04, 0.12) )
 
 
@@ -305,9 +304,7 @@ def plotCcurves():
     import os
     import sys
     from matplotlib import pyplot as pl
-    from hstsnpipe import tools
-    from hstsnpipe.tools import snana
-    from hstsnpipe.tools.snana import bifgauss
+    import stardust
 
     thisfile = sys.argv[0]
     if 'ipython' in thisfile : thisfile = __file__
@@ -320,19 +317,19 @@ def plotCcurves():
     bars = pl.bar( cedges[:-1], 6.1*cbins/float(cbins.max()), width=cedges[1]-cedges[0], alpha=0.5, color='b' )
     
     c = np.arange( -0.4, 1.2, 0.01 )
-    pcdefault = 6*snana.bifgauss( c, 0, 0.08, 0.14 )
-    pl.plot( c, pcdefault, 'k-', label='SNANA default' )
+    pcdefault = 6*stardust.bifgauss( c, 0, 0.08, 0.14 )
+    pl.plot( c, pcdefault, 'k-', label='stardust default' )
 
     # High dust : (~Model C = Neill 2006)
-    pchigh = snana.bifgauss( c, 0, 0.08, 0.38 )
+    pchigh = stardust.bifgauss( c, 0, 0.08, 0.38 )
     pl.plot( c, 6*pchigh, 'r--', label=r'High Dust ($\sim$Neill+2006)' )
 
     # Middle dust (~Kessler 2009)
-    pcmid = snana.bifgauss( c, 0, 0.08, 0.25 )
+    pcmid = stardust.bifgauss( c, 0, 0.08, 0.25 )
     pl.plot( c, 6*pcmid, 'g--', label=r'Mid Dust ($\sim$Kessler+2009)' )
 
     # low dust : (~Barbary12 minimal dust model)
-    pclow = snana.bifgauss( c, 0, 0.08, 0.1 )
+    pclow = stardust.bifgauss( c, 0, 0.08, 0.1 )
     pl.plot( c, 6*pclow, 'b--', label=r'Low Dust (Barbary+2012)'  )
 
     pl.grid()
