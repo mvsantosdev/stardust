@@ -1,0 +1,67 @@
+d2013.02.06
+S.Rodney
+
+For simplicity, set an environment variable pointing to the directory
+containing the HST SNDATA_ADDONS (i.e. this dir):
+
+For example, in (t)csh
+setenv ADDONS ~/src/stardust/SNDATA_ADDONS
+
+ or for bash/zsh
+
+export ADDONS=~/src/stardust/SNDATA_ADDONS
+
+------------------------------------------------------------
+
+The snsed_HSTSN.tgz tar ball includes a modified version of the Hsiao
+Type Ia SN sed template "Hsiao07.extrap.dat" which has been
+extrapolated down to 300 Angstroms and out to ~20000 angstroms.  The
+tar ball also includes a "non1a" directory containing modified SNANA
+templates for CC SNe.  These are the updated templates from Dan
+Scolnic, based on the SNID spectral template library, but they have
+also been extended to the IR and UV by S.R. (using snsedextend.py) in
+order to accommodate the extreme rest wavelength range required for
+simulating the F350LP band at high redshift and the F160W band at low
+redshift.  These modified templates will overwrite the default CC
+templates included in the official SNDATA_ROOT distribution, but the
+snsed_HSTSN.tgz tar ball also includes a directory "non1a.ORIG" that 
+has copies of all those original (unextrapolated) CC templates.
+
+Unpack this into your SNDATA_ROOT like this:
+
+ tar -xvzf $ADDONS/snsed_HSTSN.tgz -C $SNDATA_ROOT/snsed/
+
+------------------------------------------------------------
+
+The kcor_HST.tgz files has  kcor .input and .his files for HST filters
+used by CANDELS/CLASH.
+
+Unpack it into your SNDATA_ROOT/kcor/HST directory :
+
+ tar -xvzf $ADDONS/kcor_HST.tgz -C $SNDATA_ROOT/kcor/HST/
+
+------------------------------------------------------------
+
+Two search efficiency files are needed:
+
+ SEARCHEFF_PIPELINE_CANDELS.DAT
+ SEARCHEFF_PIPELINE_LOGIC.DAT
+
+These are in the searcheff_HSTSN.tgz tar ball.  Unpack it as:
+
+ tar -xvzf $ADDONS/searcheff_HSTSN.tgz -C $SNDATA_ROOT/models/searcheff/
+
+------------------------------------------------------------
+
+2013.04.18 SR:
+The SALT2.Guy10_UV2IR model has been updated to include a 
+sensible extrapolation beyond t=+50 days in the rest-frame.
+Previously the simulated light curves would flat-line,
+giving a constant magnitude for t_rest>50.  Now we get a
+more realistic declining magnitude by way of a linear 
+extrapolation from the final days defined for the model.
+
+ tar -xvzf $ADDONS/SALT2.Guy10_UV2IR.v2.tgz -C $SNDATA_ROOT/models/SALT2/
+
+
+------------------------------------------------------------

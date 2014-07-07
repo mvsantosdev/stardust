@@ -390,7 +390,7 @@ def doGridSim( Nsim=1000, simroot='HST_classifyGrid',
                zrange=[0.4,2.3], avrange=[0,7],
                x1range=[-3.0,3.0], crange=[-0.4,1.0],
                trestrange=[-15.,35.], treststep=1, 
-               kcorfile='HST/kcor_HST.fits', 
+               kcorfile='HST/kcor_HST_AB.fits',
                nlogz=0, ncolorpar=0, ncolorlaw=0, nlumipar=0, 
                clobber=False, omitTemplateIbc='', omitTemplateII='' ):
     """ master function to run the CC and the Ia simulations

@@ -17,10 +17,7 @@ from constants import SNTYPEDICT
 BANDORDER = 'STUCBGVRXIZWLYMJOPNQH'
 BANDORDER_RED2BLUE = 'HQNPOJMYLWZIXRVGBCUTS'
 
-
-
-
-def timestr( time ) : 
+def timestr( time ) :
     """ convert an int time into a string suitable for use 
     as an object parameter, replacing + with p and - with m
     """
@@ -130,7 +127,7 @@ def plotSimClouds( sim, xaxis='W-H', yaxis='H', mjdrange=None, tsample=5.0,
 
     if mjdrange==None : 
         mjdpkmean = np.mean( sim.SIM_PEAKMJD ) 
-        zmean = np.mean( sim.SIM_REDSHIFT ) 
+        zmean = np.mean( sim.SIM_REDSHIFT_CMB )
         mjdrange = [ mjdpkmean - 30*(1+zmean), mjdpkmean + 60*(1+zmean) ]
 
     if sidehist : 
@@ -240,22 +237,22 @@ def plotSimClouds( sim, xaxis='W-H', yaxis='H', mjdrange=None, tsample=5.0,
         ybinhigh = min(ybinhighlim,max(yarray)+0.5)
         binrange = [[xbinlow,xbinhigh],[ybinlow,ybinhigh]]
 
-    # Plot filled contours, showing  the full extent of the population,
-    # and contour lines containing 68% of the population.
-    # First, bin the points into a 2-d histogram:
-    # (Note that we reverse the x-y order here to get the binned arrays 
-    #  plotted in the correct direction )
-    if not Nbins : Nbins = int( sqrt( sim.nsim  )/2 ) 
-    count,y,x = p.histogram2d( yarray, xarray, bins=Nbins, range=[binrange[1],binrange[0]] )
-
-    # Renormalize relative to the sum of all SNe in this class : 
-    count /= count.sum()
-        
-    # Now set up an array 'cabove' such that  the cell value in cabove[i,j] 
-    # is equal to the sum of all cells that have a value higher than c[i,j]  
-    cabove = scumsum( count )
-        
     if plotstyle.startswith('contour') : 
+        # Plot filled contours, showing  the full extent of the population,
+        # and contour lines containing 68% of the population.
+        # First, bin the points into a 2-d histogram:
+        # (Note that we reverse the x-y order here to get the binned arrays
+        #  plotted in the correct direction )
+        if not Nbins : Nbins = int( sqrt( sim.nsim  )/2 )
+        count,y,x = p.histogram2d( yarray, xarray, bins=Nbins, range=[binrange[1],binrange[0]] )
+
+        # Renormalize relative to the sum of all SNe in this class :
+        count /= count.sum()
+
+        # Now set up an array 'cabove' such that  the cell value in cabove[i,j]
+        # is equal to the sum of all cells that have a value higher than c[i,j]
+        cabove = scumsum( count )
+
         # solid lines give probability contours at specified levels
         # (defaults to 0.68 for "1-sigma contours")
         ax1.contour( x[:-1], y[:-1], cabove, linelevels, colors=[plotargs['color'],plotargs['color']], ls='-' )
@@ -388,7 +385,12 @@ def plot_mag_z( sim, band='H', mjd='peak', plotstyle='median',
     band-pass contribution fractions at each 
     redshift
     detlim : plot a dashed line at the detection limit ~25.5
-    """ 
+    """
+    if sim.SURVEYDATA.KCORFILE.endswith('AB.fits') :
+        magsystem = 'AB'
+    else :
+        magsystem = 'Vega'
+
     z = sim.z
     if mjd in [ None, 0, 'pk','peak'] : 
         # read in the peak mags
@@ -465,7 +467,7 @@ def plot_mag_z( sim, band='H', mjd='peak', plotstyle='median',
     ax.set_xlim(z.min()-0.2,z.max()+0.2)
     ax.set_ylim(mag.max()+0.2,mag.min()-0.2)
     ax.set_xlabel('Redshift')
-    ax.set_ylabel('Vega Magnitude')
+    ax.set_ylabel(magsystem+' Magnitude')
     if detlim : 
         ax.axhline( 25.5, ls='--', color='0.4')
         ax.text(0.25,25.3,r'3-$\sigma$ Detection Limit', ha='left',va='bottom',color='0.4')
@@ -823,7 +825,7 @@ def plotSNR( sim, obsdat=ETCdatH_1ksec, **kwargs ):
 
     ax2.plot( mag, snr, **plotargs )
     ax2.set_ylabel('S/N Ratio')
-    ax2.set_xlabel('Vega Mag')
+    ax2.set_xlabel(magsystem+' Mag')
     #ax2.text(0.95,0.95, 'S/N Ratio', transform=ax2.transAxes, ha='right',va='top')
 
     if 'mag' in obsdat.keys() : 
