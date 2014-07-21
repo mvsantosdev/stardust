@@ -499,14 +499,18 @@ def mkinputGrid( simname,  inputfile=None, simlibfile=None,
                  clobber=False, **kwargs ):
     """ convenience function for setting up the .input file
      for a grid simulation """
+
+    snanaparam = {
+        'GENSOURCE':'GRID', 'GRID_FORMAT':'FITS',
+        'NGRID_TREST':ngrid_trest, 'GENRANGE_TREST':genrange_trest,
+        'NGRID_LOGZ':ngrid_logz, 'GENRANGE_REDSHIFT':genrange_redshift,
+        'NGRID_LUMIPAR':ngrid_lumipar, 'GENRANGE_SALT2X1':genrange_salt2x1,
+        'NGRID_COLORPAR':ngrid_colorpar, 'GENRANGE_SALT2C':genrange_salt2c,
+        'NGRID_COLORLAW':ngrid_colorlaw, 'GENRANGE_RV':genrange_rv,
+        }
+    snanaparam.update( **kwargs )
     return( mkinput( simname, inputfile=inputfile, simlibfile=simlibfile,
-                     survey=survey, simtype=simtype, 
-                     GENSOURCE='GRID', GRID_FORMAT='FITS',
-                     NGRID_TREST=ngrid_trest, GENRANGE_TREST=genrange_trest, 
-                     NGRID_LOGZ=ngrid_logz, GENRANGE_REDSHIFT=genrange_redshift, 
-                     NGRID_LUMIPAR=ngrid_lumipar, GENRANGE_SALT2X1=genrange_salt2x1,
-                     NGRID_COLORPAR=ngrid_colorpar, GENRANGE_SALT2C=genrange_salt2c,
-                     NGRID_COLORLAW=ngrid_colorlaw, GENRANGE_RV=genrange_rv, **kwargs ) )
+                     survey=survey, simtype=simtype, **snanaparam ) )
 
 def mkinput( simname,  inputfile=None, simlibfile=None,
              survey='HST', field='default',
@@ -688,6 +692,8 @@ def mkinput( simname,  inputfile=None, simlibfile=None,
         defaultdict['GENMAG_SMEAR_FILTER_UV']=['U 0.1', '# mag smearing in rest-frame UV bands']
         defaultdict['GENMAG_SMEAR_FILTER_OPT']=['BVRI 0.08', '# mag smearing in rest-frame optical bands']
         defaultdict['GENMAG_SMEAR_FILTER_IR']=['JHK 0.05', '# mag smearing in rest-frame IR bands']
+    else :
+        defaultdict['GENMAG_SMEAR_MODELNAME'] = ['NONE','# no model-based mag smearing']
 
     # overwrite the default  parameters with user specified values
     pardict = dict( defaultdict.items() + kwargs.items() )
@@ -811,7 +817,7 @@ SEARCHEFF_PIPELINE_FILE: %s  # in $SNDATA_ROOT/models/searcheff/
 #etc.
   
 #Dump out a summary .DUMP text file
-SIMGEN_DUMP: %i CID LIBID SIMEFMSK Z MU SNTYPE NON1A_INDEX  PEAKMJD AV RV S2x0 S2x1 S2c S2mb %s %s
+SIMGEN_DUMP: %i CID LIBID SIM_EFFMASK Z MU SNTYPE NON1A_INDEX  PEAKMJD AV RV S2x0 S2x1 S2c S2mb %s %s
 
 #  stop sim when effic error is this small (avoid infinite loops)
 EFFERR_STOPGEN:	0.001

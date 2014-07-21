@@ -325,7 +325,7 @@ class SimTable( object ):
             self.__dict__[ colname  ] = hdata[:][colname]
 
         # Make some shortcut aliases to most useful metadata
-        for alias, fullname in ( [['z','SIM_REDSHIFT_CMB'], ['type','SNTYPE'],['mjdpk','SIM_PEAKMJD'],
+        for alias, fullname in ( [['z','SIM_REDSHIFT_CMB'], ['z','SIM_REDSHIFT'],['type','SNTYPE'],['mjdpk','SIM_PEAKMJD'],
                                   ['Hpk','SIM_PEAKMAG_H'],['Jpk','SIM_PEAKMAG_J'],['Wpk','SIM_PEAKMAG_W'],
                                   ['Zpk','SIM_PEAKMAG_Z'],['Ipk','SIM_PEAKMAG_I'],['Xpk','SIM_PEAKMAG_X'],
                                   ['Vpk','SIM_PEAKMAG_V'], ]) : 
@@ -3879,9 +3879,17 @@ class SuperNova( object ) :
         NOTE: this is currently a bit broken if you run doGridClassify with useLuminosityPrior=2.
         """
         from matplotlib import ticker
+        import scipy.optimize as opt
         if debug : import pdb; pdb.set_trace()
         # TODO : add 2-d contour plots in z-mB and z-Av and Av-mB spaces
-        
+
+        # Define some functions for fitting a gaussian to the 1-d
+        # marginalized posterior probability distributions
+        def gauss(x, p): # p[0]==mean, p[1]==stdev
+            return 1.0/(p[1]*np.sqrt(2*np.pi))*np.exp(-(x-p[0])**2/(2*p[1]**2))
+        def errfunc(p,x,y):
+            return gauss(x, p) - y
+
         if not interactive : 
             p.ioff()
 
@@ -3898,15 +3906,17 @@ class SuperNova( object ) :
         simlist = self.ClassSim
         postProblist = [ self.postProbIa, self.postProbIbc, self.postProbII ] 
 
-        colorlist = ['darkorange','forestgreen','cyan']
+        colorlist = ['darkorange','forestgreen','darkcyan']
 
         for isim,sim,postProb,color in zip( [1,2,3], simlist, postProblist, colorlist ) : 
+            simSNclass = sim.simname.split('_')[-1]
             isCC = isim>1  # Is this a CC sim?
 
             Npar = ((len(sim.z)>1) + (len(sim.COLORPAR)>1) + (len(sim.COLORLAW)>1) + 
                     (len(sim.LUMIPAR)>1) + (len(sim.PKMJD)>1) + (len(sim.LUMIPAR)>1) )
             Ncol = Npar+2
             iax=(isim-1)*Ncol+1
+
 
             # panel 1 : histogram of chi2 values for chi2/nu < 10
             ax1 = fig.add_subplot(3,Ncol,iax)
@@ -3931,9 +3941,9 @@ class SuperNova( object ) :
             else : i90 = max(10,np.where( likefrac < 0.9 )[0][-1])
             histLike, edgeLike = np.histogram( sim.LIKE[ilikesorted][:i90], bins=max( int(i90/10.), i90+1) )
             ax2.plot( edgeLike[:-1]/sim.LIKE.sum(),  histLike,  marker=' ', ls='steps-pre-', color=color, lw=1.5)
-            ax2.set_xlabel('p(D$|$%s) / total'%sim.simname.split('_')[-1])
+            ax2.set_xlabel('p(D$|$%s) / total'%simSNclass )
             ax2.yaxis.set_tick_params( pad=-20 )
-            ax2.text( 0.05, 0.95, 'N( p(D$|$%s) )'%sim.simname.split('_')[-1], ha='left',va='top', transform=ax2.transAxes, color=color )
+            ax2.text( 0.05, 0.95, 'N( p(D$|$%s) )'%simSNclass, ha='left',va='top', transform=ax2.transAxes, color=color )
             if isim==1 : ax1.text( 0.05, 1.05, '%s (%s)   P(Ia,Ib/c,II)= [ %.1f, %.1f, %.1f ]'%(self.name,self.nickname,self.PIa,self.PIbc,self.PII),
                                    ha='left', va='bottom', fontsize='x-large', transform=ax1.transAxes )
             ax2.yaxis.set_ticks_position('right')
@@ -3962,56 +3972,55 @@ class SuperNova( object ) :
                 # Define the parameter name and x-axis title strings, 
                 # and get the prior values
                 if iparam==0 : 
-                    parname, xlabel = 'z', 'redshift'
+                    parlabel, xlabel = 'z', 'redshift'
                     prior = sim.zPriorVec
                     xlim = [ self.z-1.2*self.zerr, self.z+1.2*self.zerr]
                     xtmaj = np.round(3*self.zerr/4.,3)
                     xtmin = np.round(xtmaj/2., 4 )
                 elif iparam==1 : 
                     if isCC : 
-                        parname, xlabel = 'Av', 'Host Extinction'
+                        parlabel, xlabel = 'Av', 'Host Extinction'
                         prior = sim.AvPriorVec
                         dx = (sim.AV.max()-sim.AV.min())/len(sim.AV)
                         xlim = [ sim.AV.min()-dx, sim.AV.max()+dx ]
                         xtmaj,xtmin = 2,1
                     else : 
-                        parname, xlabel = 'c', 'SALT2 color'
+                        parlabel, xlabel = 'c', 'SALT2 color'
                         prior = sim.cPriorVec
                         dx = (sim.c.max()-sim.c.min())/len(sim.c)
                         xlim = [ sim.c.min()-dx, sim.c.max()+dx ]
-                        xlim = [ -0.7, 1.2 ]
                         xtmaj,xtmin = 0.5,0.25
                 elif iparam==2 : 
                     if isCC : 
-                        parname, xlabel = 'Rv', 'Extinction Law'
+                        parlabel, xlabel = 'Rv', 'Extinction Law'
                         prior = sim.RvPriorVec
                         xlim=None
                     else : 
-                        parname, xlabel = r'$\beta$', r'SALT2 $\beta$'
+                        parlabel, xlabel = r'$\beta$', r'SALT2 $\beta$'
                         prior = sim.BetaPriorVec
                         xlim=None
                 elif iparam==3 and 'x1PriorVec' in sim.__dict__ : 
-                    parname, xlabel = 'x1', 'SALT2 x1'
+                    parlabel, xlabel = 'x1', 'SALT2 x1'
                     prior = sim.x1PriorVec
                     dx = (sim.x1.max()-sim.x1.min())/float(len(sim.x1))
                     xlim = [ -3.6, 3.8 ]
                     xtmaj,xtmin = 2,1
                 elif iparam==3 :
                     if 'Ib' in sim.SIM_SUBTYPE : 
-                        parname, xlabel = 'tmp', 'Ib/c template'
+                        parlabel, xlabel = 'tmp', 'Ib/c template'
                     else : 
-                        parname, xlabel = 'tmp', 'II template'
+                        parlabel, xlabel = 'tmp', 'II template'
                     Ntemp = len( sim.LUMIPAR )
                     prior = np.ones( Ntemp )
                     paramvec = np.arange( Ntemp )
                     xlim= [-1.5, Ntemp+1.5 ]
                     xtmaj,xtmin = 5,1
                 elif iparam==4 : 
-                    parname, xlabel = 't$_{pk}$', '$\Delta$ MJD peak'
+                    parlabel, xlabel = 't$_{pk}$', '$\Delta$ MJD peak'
                     prior = np.ones( len(sim.PKMJD) )
                     xlim = None 
                 elif iparam==5 : 
-                    parname, xlabel = '$\Delta$m', 'mag offset'  
+                    parlabel, xlabel = '$\Delta$m', 'mag offset'
                     xlim=None
 
                     # The mag offset parameter is a Special case : 
@@ -4043,12 +4052,27 @@ class SuperNova( object ) :
                 postProb1d = ppgridMarginalized / ppgridMarginalized.max()
                 isorted = paramvec.argsort()
 
+                # Fit a guassian to the 1-D posterior probability distribution
+                # Inital guess for gaussian mu and sigma :
+                p0 = [ paramvec[postProb1d.argmax()], np.mean(np.diff(paramvec)) ]
+                # renormalize to a proper PDF for fitting
+                paramspan = float(paramvec[isorted][-1]-paramvec[isorted][0])
+                postPDF1d = postProb1d[isorted] / ((paramspan/len(paramvec))*postProb1d.sum())
+                p1, success = opt.leastsq(errfunc, p0[:], args=(paramvec[isorted], postPDF1d[isorted]))
+                if success not in [1,2,3,4] :
+                    print("WARNING : can't fit a gaussian to %s posterior distribution"%parlabel)
+                    p1 = p0
+
+                parlabelclean = parlabel.translate(None,'$\\_')
+                sim.__dict__['%s_maxprob'%parlabelclean] = p1[0]
+                sim.__dict__['%s_maxprob_err'%parlabelclean] = p1[1]
+
                 ax.plot( paramvec[isorted], postProb1d[isorted], ls='steps-mid-', color=color,zorder=15, lw=1.5 )
                 if showpriors: 
                     ax.plot( paramvec[isorted], prior[isorted] / prior.max() , ls='steps-mid--', color='k',zorder=20, lw=0.7 )
-
-                ax.text( 0.05, 0.95, 'p(%s$|$D)'%parname, ha='left',va='top', transform=ax.transAxes, color=color )
-                ax.text( 0.98, 0.95, 'p(%s)'%parname, ha='right',va='top', transform=ax.transAxes, color='k' )
+                    ax.text( 0.98, 0.95, 'p(%s)'%parlabel, ha='right',va='top', transform=ax.transAxes, color='k' )
+                ax.text( 0.05, 0.95, 'p(%s$|$D)'%parlabel, ha='left',va='top', transform=ax.transAxes, color=color )
+                ax.text( 0.98, 0.05, '%.2f\n $\pm$ %.2f'%(p1[0],p1[1]), ha='right',va='bottom', transform=ax.transAxes, color=color)
                 ax.set_xlabel( xlabel )
                 ax.set_yticklabels( [] )
                 ax.set_ylim( 0, 1.2 )

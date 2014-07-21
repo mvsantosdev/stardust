@@ -33,12 +33,21 @@ Unpack this into your SNDATA_ROOT like this:
 
 ------------------------------------------------------------
 
-The kcor_HST.tgz files has  kcor .input and .his files for HST filters
+The kcor_HST.tgz files has  kcor .input and .fits files for HST filters
 used by CANDELS/CLASH.
 
 Unpack it into your SNDATA_ROOT/kcor/HST directory :
 
  tar -xvzf $ADDONS/kcor_HST.tgz -C $SNDATA_ROOT/kcor/HST/
+
+------------------------------------------------------------
+
+The filters_HST_CANDELS.tgz file has HST filter transmission curves for 
+all filters used in the CANDELS and CLASH SN surveys.
+
+Unpack it into your SNDATA_ROOT/kcor/HST directory :
+
+ tar -xvzf $ADDONS/filters_HST_CANDELS.tgz -C $SNDATA_ROOT/filters/HST/
 
 ------------------------------------------------------------
 
